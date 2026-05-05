@@ -218,6 +218,13 @@ input[type=checkbox]{width:16px;height:16px;border:0.5px solid rgba(0,168,132,0.
         </div>
       </div>
 
+      <div class="krz-consent">
+        <input type="checkbox" id="consent"/>
+        <span class="consent-txt">
+          I agree to Kairoz Corporation's <a href="#">Program Terms</a> and authorize
+          contact regarding enrollment, program updates, and agentic AI research initiatives.
+        </span>
+      </div>
 
       <button class="krz-btn" id="submit-btn" onclick="handleSubmit()">
         <div class="btn-sweep"></div>
@@ -283,7 +290,7 @@ input[type=checkbox]{width:16px;height:16px;border:0.5px solid rgba(0,168,132,0.
     return;
   }
 
-  var phoneRe = /^[0-9]{7,15}$/;
+  var phoneRe = /^[0-9+\s]{7,20}$/;
   if (!phoneRe.test(phone)) {
     err.style.display = "block";
     err.textContent = "Invalid phone number.";
@@ -294,12 +301,13 @@ input[type=checkbox]{width:16px;height:16px;border:0.5px solid rgba(0,168,132,0.
   document.getElementById("submit-btn").disabled = true;
 
   var payload = {
-    firstName: fname,
-    lastName: lname,
-    email: email,
-    phone: dial + " " + phone,
-    submittedAt: new Date().toISOString()
-  };
+  category: currentCategory === "student" ? "Student" : "Working Professional",
+  firstName: fname,
+  lastName: lname,
+  email: email,
+  phone: dial + " " + phone,
+  submittedAt: new Date().toISOString()
+};
 
   fetch(APPS_SCRIPT_URL, {
     method: "POST",
