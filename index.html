@@ -252,7 +252,7 @@ input[type=checkbox]{width:16px;height:16px;border:0.5px solid rgba(0,168,132,0.
 </div>
 
 <script>
-  var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz9PXL2i8F3jUPGrYJVMQTAnvTd7pAiwpQVtKSDwZtHVX2doqvg0u4cQVMqUIgK-kXh/exec";
+  var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzlDPmq1xne8QbhXI9XlBGyOT7XrCmYXn9uE68lkp2ngrtIxsdKHYqp_4utPIkxAYE0/exec";
   var currentCategory = "student";
 
   function setCategory(cat) {
@@ -309,23 +309,21 @@ input[type=checkbox]{width:16px;height:16px;border:0.5px solid rgba(0,168,132,0.
   submittedAt: new Date().toISOString()
 };
 
-  fetch(APPS_SCRIPT_URL, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload)
-  })
-  .then(res => res.json())
-  .then(() => {
-    submitting.style.display = "none";
-    document.getElementById("krz-form").style.display = "none";
-    document.getElementById("krz-success").style.display = "block";
-  })
-  .catch(() => {
-    submitting.style.display = "none";
-    document.getElementById("submit-btn").disabled = false;
-    err.style.display = "block";
-    err.textContent = "Submission failed.";
-  });
+fetch(APPS_SCRIPT_URL, {
+  method: "POST",
+  body: new URLSearchParams(payload)
+})
+.then(() => {
+  submitting.style.display = "none";
+  document.getElementById("krz-form").style.display = "none";
+  document.getElementById("krz-success").style.display = "block";
+})
+.catch(() => {
+  submitting.style.display = "none";
+  document.getElementById("submit-btn").disabled = false;
+  err.style.display = "block";
+  err.textContent = "Submission failed.";
+});
 }
 </script>
 </body>
