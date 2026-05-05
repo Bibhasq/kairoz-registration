@@ -1,4 +1,4 @@
-`<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
@@ -264,88 +264,68 @@ input[type=checkbox]{width:16px;height:16px;border:0.5px solid rgba(0,168,132,0.
   }
 
   function handleSubmit() {
-    var fname   = document.getElementById("fname").value.trim();
-    var lname   = document.getElementById("lname").value.trim();
-    var email   = document.getElementById("email").value.trim();
-    var dial    = document.getElementById("dial").value;
-    var phone   = document.getElementById("phone").value.trim();
-    var consent = document.getElementById("consent").checked;
-    var err     = document.getElementById("krz-err");
-    var submitting = document.getElementById("krz-submitting");
+  var err = document.getElementById("krz-err");
+  var submitting = document.getElementById("krz-submitting");
 
-    // Category-specific fields
-    var extraData = {};
-    if (currentCategory === "student") {
-      var institution = document.getElementById("institution").value.trim();
-      var degree      = document.getElementById("degree").value;
-      var gradYear    = document.getElementById("grad-year").value;
-      if (!institution || !degree || !gradYear) {
-        err.style.display = "block";
-        err.textContent = "Please complete all student details.";
-        return;
-      }
-      extraData = { institution: institution, degree: degree, graduationYear: gradYear };
-    } else {
-      var company    = document.getElementById("company").value.trim();
-      var jobTitle   = document.getElementById("job-title").value.trim();
-      var experience = document.getElementById("experience").value;
-      if (!company || !jobTitle || !experience) {
-        err.style.display = "block";
-        err.textContent = "Please complete all professional details.";
-        return;
-      }
-      extraData = { company: company, jobTitle: jobTitle, experience: experience };
-    }
+  err.style.display = "none";
+  err.textContent = "";
 
-    if (!fname || !lname || !email || !phone || !consent) {
-      err.style.display = "block";
-      err.textContent = "Please complete all required fields and accept the terms.";
-      return;
-    }
-    var emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRe.test(email)) {
-      err.style.display = "block";
-      err.textContent = "Please enter a valid email address.";
-      return;
-    }
+  var fname = document.getElementById("fname").value.trim();
+  var lname = document.getElementById("lname").value.trim();
+  var email = document.getElementById("email").value.trim();
+  var dial  = document.getElementById("dial").value;
+  var phone = document.getElementById("phone").value.trim();
+  var consent = document.getElementById("consent").checked;
 
-    if (APPS_SCRIPT_URL === "YOUR_APPS_SCRIPT_URL") {
-      err.style.display = "block";
-      err.textContent = "Setup incomplete: please add your Google Apps Script URL.";
-      return;
-    }
-
-    err.style.display = "none";
-    submitting.style.display = "block";
-    document.getElementById("submit-btn").disabled = true;
-
-    var payload = Object.assign({
-      category:    currentCategory === "student" ? "Student" : "Working Professional",
-      firstName:   fname,
-      lastName:    lname,
-      email:       email,
-      phone:       dial + " " + phone,
-      submittedAt: new Date().toLocaleString()
-    }, extraData);
-
-    fetch(APPS_SCRIPT_URL, {
-      method: "POST",
-      mode: "no-cors",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
-    })
-    .then(function() {
-      submitting.style.display = "none";
-      document.getElementById("krz-form").style.display = "none";
-      document.getElementById("krz-success").style.display = "block";
-    })
-    .catch(function() {
-      submitting.style.display = "none";
-      document.getElementById("submit-btn").disabled = false;
-      document.getElementById("krz-err").style.display = "block";
-      document.getElementById("krz-err").textContent = "Submission failed. Please try again.";
-    });
+  if (!fname || !lname || !email || !phone || !consent) {
+    err.style.display = "block";
+    err.textContent = "Please complete all required fields and accept the terms.";
+    return;
   }
+
+  var emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRe.test(email)) {
+    err.style.display = "block";
+    err.textContent = "Invalid email.";
+    return;
+  }
+
+  var phoneRe = /^[0-9]{7,15}$/;
+  if (!phoneRe.test(phone)) {
+    err.style.display = "block";
+    err.textContent = "Invalid phone number.";
+    return;
+  }
+
+  submitting.style.display = "block";
+  document.getElementById("submit-btn").disabled = true;
+
+  var payload = {
+    firstName: fname,
+    lastName: lname,
+    email: email,
+    phone: dial + " " + phone,
+    submittedAt: new Date().toISOString()
+  };
+
+  fetch(APPS_SCRIPT_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload)
+  })
+  .then(res => res.json())
+  .then(() => {
+    submitting.style.display = "none";
+    document.getElementById("krz-form").style.display = "none";
+    document.getElementById("krz-success").style.display = "block";
+  })
+  .catch(() => {
+    submitting.style.display = "none";
+    document.getElementById("submit-btn").disabled = false;
+    err.style.display = "block";
+    err.textContent = "Submission failed.";
+  });
+}
 </script>
 </body>
 </html>
